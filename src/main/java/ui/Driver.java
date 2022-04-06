@@ -1,22 +1,24 @@
 package ui;
 
 import java.time.Duration;
+import java.util.ArrayList;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.JavascriptExecutor;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import ui.musala.GoogleReCaptcha;
 
 public class Driver {
 	private WebDriver driver;
 	private WebDriverManager driverManager;
+	private Config config;
 
 	public Driver(AvailableBrowsers driverName) {
 		switch (driverName) {
@@ -36,12 +38,14 @@ public class Driver {
 		}
 	}
 
-	public void setupPage(Config cfg) {
+	public void setup(Config cfg) {
+		config = cfg;
+		driverManager.clearDriverCache();
 		driverManager.timeout(cfg.getTimeoutSeconds());
 		driver.get(cfg.getUrl());
 	}
 
-	public WebDriver getDriver() {
+	public WebDriver getWebDriver() {
 		return driver;
 	}
 
@@ -59,26 +63,45 @@ public class Driver {
 		driver.findElement(by).sendKeys(text);
 	}
 
-	public void byPassGoogleReCaptcha(Config cfg) {
-		if (cfg.isCaptchaDisabled()) {
+	public void submitWithGoogleReCaptcha(By submitLocator, ExpectedCondition<WebElement> reachedExpectation) {
+		if (config.isCaptchaDisabled()) {
 			System.out.println("[warn] captcha is disabled, applied for internal testing/staging environment only!");
-			return;
+			driver.findElement(submitLocator).click();
+
+			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getTimeoutSeconds()));
+			wait.until(reachedExpectation);
 		} else {
 			System.out.println(
 					"[warn] captcha is enabled, the purpose is to prevent bots including automation testing. \n"
-							+ "Hence, this test execution may requires MANUAL RESOLVING CAPTCHA if captcha challenges displayed, \n"
-							+ "or the test will be failed in 300 seconds!");
-			// ref: https://www.lambdatest.com/blog/handle-captcha-in-selenium/
+							+ "Hence, this test execution may requires MANUAL RESOLVING CAPTCHA AND SUBMIT \n"
+							+ "or the test will be failed in 300 seconds!"); // ref:
+																				// https://www.lambdatest.com/blog/handle-captcha-in-selenium/
+
 			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(300));
-			wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(GoogleReCaptcha.reCaptchaForm));
-			wait.until(ExpectedConditions.elementToBeClickable(GoogleReCaptcha.reCaptchaCheckbox)).click();
-			wait.until(ExpectedConditions.visibilityOfElementLocated(GoogleReCaptcha.reCaptchaCheckMark));
-			System.out.println("[info] passed captcha checking!");
+			wait.until(reachedExpectation);
+
+//				wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(GoogleReCaptcha.reCaptchaForm));
+//				wait.until(ExpectedConditions.elementToBeClickable(GoogleReCaptcha.reCaptchaCheckbox)).click();
+//				wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(GoogleReCaptcha.reCaptchaCheckMark));
 		}
 	}
 
-	public void clickIfClickable(By by, Config cfg) {
-		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(cfg.getTimeoutSeconds()));
-		wait.until(ExpectedConditions.elementToBeClickable(GoogleReCaptcha.reCaptchaCheckMark)).click();
+	public boolean isTextDisplayed(By by, String text) {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getTimeoutSeconds()));
+		return wait.until(ExpectedConditions.textToBe(by, text));
+	}
+
+	public void quit() {
+		if (driver != null) {
+			driver.quit();
+		}
+	}
+
+	public String getCurrentURL() {
+		return driver.getCurrentUrl();
+	}
+
+	public boolean isDisplay(By by) {
+		return driver.findElement(by).isDisplayed();
 	}
 }
