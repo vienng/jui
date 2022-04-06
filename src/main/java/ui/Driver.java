@@ -13,7 +13,6 @@ import org.openqa.selenium.JavascriptExecutor;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import ui.musala.GoogleReCaptcha;
-import ui.musala.MusalaWebApplication;
 
 public class Driver {
 	private WebDriver driver;
@@ -77,7 +76,7 @@ public class Driver {
 			System.out.println("[info] passed captcha checking!");
 		}
 	}
-	
+
 	public void clickIfClickable(By by, Config cfg) {
 		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(cfg.getTimeoutSeconds()));
 		wait.until(ExpectedConditions.elementToBeClickable(GoogleReCaptcha.reCaptchaCheckMark)).click();
