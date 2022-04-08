@@ -35,7 +35,7 @@ public class DataDriven {
 
 				fields.add(i, new Field(headers[i], cells[i], ""));
 			}
-			
+
 			records.add(new Form(fields));
 		}
 		return this;
@@ -50,11 +50,15 @@ public class DataDriven {
 	public Form getData(int index) {
 		return records.get(index);
 	}
-	
-	public Field getField(String name) {
+
+	public Form randomData() {
 		if (records.isEmpty()) {
-			return new Form(null).getField(name);
+			return null;
 		}
-		return records.get(0).getField(name);
+		Form form = records.get(0);
+		form.getFields().forEach((field) -> {
+			field.random();
+		});
+		return form;
 	}
 }

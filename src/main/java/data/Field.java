@@ -4,20 +4,21 @@ import com.mifmif.common.regex.Generex;
 
 public class Field {
 	private String name;
-	private Object value;
+	private String value;
 	private Generex gen;
 
-	public Field(String name, Object value, String regex) {
+	public Field(String name, String value, String regex) {
 		this.name = name;
 		this.value = value;
 		this.gen = new Generex(regex);
 	}
 
 	public String random() {
-		return gen.random();
+		this.value = gen.random();
+		return value;
 	}
 
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
 

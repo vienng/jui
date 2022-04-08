@@ -30,4 +30,8 @@ public class Form {
 		System.err.println("field not found:" + name);
 		return null;
 	}
+	
+	public List<Field> getFields() {
+		return fields;
+	}
 }
