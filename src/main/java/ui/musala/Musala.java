@@ -4,7 +4,7 @@ import org.openqa.selenium.By;
 
 import data.DataDriven;
 
-public abstract class MusalaWebApplication {
+public abstract class Musala {
 	public static final By contactUsButtonLocator = By.xpath("//span[@data-alt='Contact us']");
 	public static final By contactUsNameLocator = By.xpath("//input[@name='your-name']");
 	public static final By contactUsEmailLocator = By.xpath("//input[@name='your-email']");

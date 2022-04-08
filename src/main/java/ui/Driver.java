@@ -49,7 +49,14 @@ public class Driver {
 		return driver;
 	}
 
-	public void scrollTo(By by) {
+	public void scrollToClick(By by) {
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+		WebElement elem = driver.findElement(by);
+		js.executeScript("arguments[0].scrollIntoView();", elem);
+		js.executeScript("arguments[0].click();", elem);
+	}
+	
+	public void scrollToView(By by) {
 		JavascriptExecutor js = (JavascriptExecutor) driver;
 		WebElement elem = driver.findElement(by);
 		js.executeScript("arguments[0].scrollIntoView();", elem);
@@ -63,26 +70,23 @@ public class Driver {
 		driver.findElement(by).sendKeys(text);
 	}
 
-	public void submitWithGoogleReCaptcha(By submitLocator, ExpectedCondition<WebElement> reachedExpectation) {
+	public void submitWithReCaptcha(By submitLocator, ExpectedCondition<WebElement> reachedExpectation) {
 		if (config.isCaptchaDisabled()) {
 			System.out.println("[warn] captcha is disabled, applied for internal testing/staging environment only!");
+			
+			// assume button is clickable on testing environment
 			driver.findElement(submitLocator).click();
 
 			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(config.getTimeoutSeconds()));
 			wait.until(reachedExpectation);
 		} else {
-			System.out.println(
-					"[warn] captcha is enabled, the purpose is to prevent bots including automation testing. \n"
-							+ "Hence, this test execution may requires MANUAL RESOLVING CAPTCHA AND SUBMIT \n"
-							+ "or the test will be failed in 300 seconds!"); // ref:
-																				// https://www.lambdatest.com/blog/handle-captcha-in-selenium/
+			System.out.println("[warn] captcha is enabled, requires MANUAL RESOLVING CAPTCHA AND SUBMIT \n"
+							+ "or the test will be failed in 300 seconds!");
 
+			// manually resolving captcha challenges and continue
+			
 			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(300));
 			wait.until(reachedExpectation);
-
-//				wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(GoogleReCaptcha.reCaptchaForm));
-//				wait.until(ExpectedConditions.elementToBeClickable(GoogleReCaptcha.reCaptchaCheckbox)).click();
-//				wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(GoogleReCaptcha.reCaptchaCheckMark));
 		}
 	}
 
@@ -101,7 +105,17 @@ public class Driver {
 		return driver.getCurrentUrl();
 	}
 
-	public boolean isDisplay(By by) {
+	public boolean isElementDisplay(By by) {
 		return driver.findElement(by).isDisplayed();
+	}
+	
+	public void waitUntil(ExpectedCondition<WebElement> condition, int timeoutSeconds) {
+		WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
+		wait.until(condition);
+	}
+	
+	public void switchTab(int toTabIdx) {
+		ArrayList<String> tabs = new ArrayList<String> (driver.getWindowHandles());
+	    driver.switchTo().window(tabs.get(toTabIdx));
 	}
 }
