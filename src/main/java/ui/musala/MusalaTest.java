@@ -5,13 +5,19 @@ import static org.testng.Assert.*;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.By.ByClassName;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.pagefactory.ByChained;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Parameters;
 import org.testng.annotations.Test;
@@ -29,7 +35,7 @@ public class MusalaTest {
 	Driver driver;
 
 	@Parameters("browser")
-	@BeforeTest()
+	@BeforeMethod()
 	public void setUp(String browser) {
 		cfg = new Config();
 		cfg.loadConfig();
@@ -44,7 +50,7 @@ public class MusalaTest {
 		driver.setup(cfg);
 	}
 
-	@AfterTest()
+	@AfterMethod()
 	public void tearDown() {
 		driver.quit();
 		System.out.println("[info] tear down successfully!");
@@ -69,10 +75,10 @@ public class MusalaTest {
 			driver.inputText(Musala.contactUsMessageLocator, formData.getField("message").getValue());
 			driver.inputText(Musala.contactUsEmailLocator, invalidEmails[i]);
 			driver.submitWithReCaptcha(Musala.contactUsSendButtonLocator,
-					ExpectedConditions.visibilityOfElementLocated((Musala.contactUsAlertEmailLocator)));
+					ExpectedConditions.visibilityOfElementLocated((Musala.contactUsAlertLocator)));
 
 			assertTrue(
-					driver.isTextDisplayed(Musala.contactUsAlertEmailLocator, Musala.contactUsInvalidEmailErrorValue),
+					driver.isTextDisplayed(Musala.contactUsAlertLocator, Musala.contactUsInvalidEmailErrorValue),
 					"message not found!");
 		}
 	}
@@ -89,38 +95,86 @@ public class MusalaTest {
 		driver.switchTab(1);
 		assertEquals(driver.getCurrentURL(), Musala.companyFacebookURLValue);
 
-		driver.waitUntil(ExpectedConditions.visibilityOfElementLocated(Musala.companyFacebookProfilePhotoLocator),
-				cfg.getTimeoutSeconds());
+		driver.waitUntil(ExpectedConditions.presenceOfElementLocated(Musala.companyFacebookProfilePhotoLocator), cfg.getTimeoutSeconds());
 		assertTrue(driver.isElementDisplay(Musala.companyFacebookProfilePhotoLocator));
 	}
 
 	@Test(description = "Test Case 3")
-	public void tc3() throws IOException, CsvException {
-		String filePath = this.getClass().getResource("tc3.csv").getPath();
+	public void testApplyAPosition() throws IOException, CsvException {
+		String filePath = MusalaTest.class.getClassLoader().getResource("tc3.csv").getPath();
 		DataDriven data = new DataDriven().parse(filePath);
 
+		List<Form> dataTests = data.getAll();
+		assertFalse(dataTests.isEmpty(), "no data test!");
+
+		dataTests.forEach((formData) -> {
+			driver.setup(cfg);
+
+			driver.scrollToClick(Musala.careersHomeTabTabLocator);
+
+			driver.scrollToClick(Musala.careersCheckOpenPositionsLocator);
+			assertEquals(driver.getCurrentURL(), Musala.careersJoinUsURLValue);
+
+			driver.selectOption(Musala.careersLocationSelectorLocator, "Anywhere");
+
+			driver.scrollToClick(Musala.careersAutomationQAEngineerLocator);
+
+			driver.scrollToView(Musala.careersGeneralDescriptionLocator);
+			assertTrue(driver.isElementDisplay(Musala.careersGeneralDescriptionLocator),
+					"general description not found!");
+
+			driver.scrollToView(Musala.careersRequirementsLocator);
+			assertTrue(driver.isElementDisplay(Musala.careersRequirementsLocator), "requirements not found!");
+
+			driver.scrollToView(Musala.careersResponsibilitiesLocator);
+			assertTrue(driver.isElementDisplay(Musala.careersResponsibilitiesLocator), "responsibilities not found!");
+
+			driver.scrollToView(Musala.careersWhatweofferLocator);
+			assertTrue(driver.isElementDisplay(Musala.careersWhatweofferLocator), "'what we offer' not found!");
+
+			driver.scrollToClick(Musala.careersApplyButtonLocator);
+
+			driver.inputText(Musala.careersApplyNameLocator, formData.getField("name").getValue());
+			driver.inputText(Musala.careersApplyEmailLocator, formData.getField("email").getValue());
+			driver.inputText(Musala.careersApplyMobileLocator, formData.getField("mobile").getValue());
+			driver.inputText(Musala.careersApplyLinkedInLocator, formData.getField("linkedin").getValue());
+			driver.inputText(Musala.careersApplyMessageLocator, formData.getField("message").getValue());
+			driver.upload(Musala.careersApplyCVLocator, "path/my_cv.pdf");
+			driver.click(Musala.careersApplyAggreementLocator);
+
+			driver.submitWithReCaptcha(Musala.careersApplySendButtonLocator,
+					ExpectedConditions.presenceOfElementLocated(Musala.careerApplyErrorPopupLocator));
+			driver.waitUntil(ExpectedConditions.presenceOfElementLocated(Musala.careerApplyErrorPopupCloseLocator),
+					cfg.getTimeoutSeconds());
+			
+			assertTrue(driver.isTextDisplayed(Musala.careerApplyErrorAlertLocator,
+					formData.getField("expected_error").getValue()));
+		});
+	}
+
+	@Test(description = "Test Case 4")
+	public void testListingOpenPositions() {
 		driver.scrollToClick(Musala.careersHomeTabTabLocator);
-
+		
 		driver.scrollToClick(Musala.careersCheckOpenPositionsLocator);
-		assertEquals(driver.getCurrentURL(), Musala.careersJoinUsURLValue);
-
-		driver.click(Musala.careersLocationSelectorLocator);
-		driver.click(Musala.careersLocationAnywhereLocator);
-
-		driver.scrollToClick(Musala.careersAutomationQAEngineerLocator);
-
-		driver.scrollToView(Musala.careersGeneralDescriptionLocator);
-		assertTrue(driver.isElementDisplay(Musala.careersGeneralDescriptionLocator), "general description not found!");
-
-		driver.scrollToView(Musala.careersRequirementsLocator);
-		assertTrue(driver.isElementDisplay(Musala.careersRequirementsLocator), "requirements not found!");
-
-		driver.scrollToView(Musala.careersResponsibilitiesLocator);
-		assertTrue(driver.isElementDisplay(Musala.careersResponsibilitiesLocator), "responsibilities not found!");
-
-		driver.scrollToView(Musala.careersWhatweofferLocator);
-		assertTrue(driver.isElementDisplay(Musala.careersWhatweofferLocator), "'what we offer' not found!");
-
-		driver.scrollToClick(Musala.careersApplyButtonLocator);
+		
+		String[] cities = {"Sofia", "Skopje"};
+		
+		for (int i = 0; i < cities.length; i++) {
+			driver.selectOption(Musala.careersLocationSelectorLocator, cities[i]);
+			
+			List<String> titles = driver.getAtributesByClassName(Musala.careersJobTitleClassName, "data-alt");
+			List<String> links = driver.getAtributesByClassName(Musala.careersJobLinkClassName, "href");
+			
+			assertFalse(titles.isEmpty(), "empty title list!");
+			assertEquals(titles.size(), links.size(), "size of links and titles are not equal!");
+			
+			System.out.println("---------" + cities[i] + "---------");
+			for (int j = 0; j < titles.size(); j++) {
+				System.out.println("Position: " + titles.get(j));
+				System.out.println("More info: " + links.get(j));
+				System.out.println("---");
+			}
+		}		
 	}
 }

@@ -62,7 +62,7 @@ public class DataDriven {
 		return form;
 	}
 	
-	public List<Form> getAllData() {
+	public List<Form> getAll() {
 		return formDatas;
 	}
 }

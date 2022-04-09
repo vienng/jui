@@ -1,3 +1,3 @@
-id,name,info
-1,ss,ee
-2,sddd,333
+name,email,mobile,linkedin,message,expected_error
+A,a@gmail.com,,linkedin.com/a,I am A,The field is required.
+B,b@gmail.com.b,*,linkedin.com/b,I am B,The telephone number is invalid.

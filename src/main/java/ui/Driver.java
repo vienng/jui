@@ -2,15 +2,19 @@ package ui;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.By.ByClassName;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.pagefactory.ByChained;
 import org.openqa.selenium.JavascriptExecutor;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -117,5 +121,25 @@ public class Driver {
 	public void switchTab(int toTabIdx) {
 		ArrayList<String> tabs = new ArrayList<String> (driver.getWindowHandles());
 	    driver.switchTo().window(tabs.get(toTabIdx));
+	}
+	
+	public void upload(By by, String filePath) {
+	}
+	
+	public void selectOption(By by, String text) {
+		Select opt = new Select(driver.findElement(by));
+		opt.selectByVisibleText(text);
+	}
+	
+	public List<String> getAtributesByClassName(String className, String atributeName) {
+	    By.ByClassName byClassNames = new ByClassName(className);
+	    List<WebElement> list = driver.findElements(new ByChained(byClassNames));
+	    List<String> values = new ArrayList<String>(list.size());
+	    
+	    list.forEach((element) -> {
+	    	values.add(element.getAttribute(atributeName));
+	    });
+	    
+	    return values;
 	}
 }
