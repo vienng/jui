@@ -4,13 +4,13 @@
   <test name="firefox">
   <parameter name="browser" value="firefox"></parameter>
   <classes>
-  <class name="ui.musala.MusalaWebApplicationTest"/>
+  <class name="ui.musala.MusalaTest"/>
   </classes>
   </test>
   <test name = "chrome">
   <parameter name="browser" value="chrome"></parameter>
   <classes>
-  <class name="ui.musala.MusalaWebApplicationTest"/>
+  <class name="ui.musala.MusalaTest"/>
   </classes>
   </test>
 </suite> <!-- Suite -->

@@ -9,10 +9,10 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 
 public class DataDriven {
-	private List<Form> records;
+	private List<Form> formDatas;
 
 	public DataDriven() {
-		records = new ArrayList<Form>();
+		formDatas = new ArrayList<Form>();
 	}
 
 	public DataDriven parse(String csvFilePath) throws IOException, CsvException {
@@ -35,26 +35,34 @@ public class DataDriven {
 
 				fields.add(i, new Field(headers[i], cells[i], ""));
 			}
-			
-			records.add(new Form(fields));
+
+			formDatas.add(new Form(fields));
 		}
 		return this;
 	}
 
 	public DataDriven withGenRegex(String[] headers, String[] regexes) {
-		records = new ArrayList<Form>(1);
-		records.add(new Form(headers, regexes));
+		formDatas = new ArrayList<Form>(1);
+		formDatas.add(new Form(headers, regexes));
 		return this;
 	}
 
 	public Form getData(int index) {
-		return records.get(index);
+		return formDatas.get(index);
+	}
+
+	public Form randomData() {
+		if (formDatas.isEmpty()) {
+			return null;
+		}
+		Form form = formDatas.get(0);
+		form.getFields().forEach((field) -> {
+			field.random();
+		});
+		return form;
 	}
 	
-	public Field getField(String name) {
-		if (records.isEmpty()) {
-			return new Form(null).getField(name);
-		}
-		return records.get(0).getField(name);
+	public List<Form> getAll() {
+		return formDatas;
 	}
 }
