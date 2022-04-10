@@ -7,7 +7,7 @@ What does jui offer?
 
 **Ability run test on one or multiple browsers**
 
-in [config.properties](/jui/src/main/resources/config.properties)
+in `config.properties`
 
 ```
 browsers=chrome
@@ -18,7 +18,7 @@ or
 browsers=chrome:firefox
 ```
 
-**Ability generate data test from a defined template or parse data test from a file**
+**Ability generate data test from a defined template or parse from a file**
 
 Generating random data tests is preferred in development/testing environments when the input is meaningless.
 Centralizing data test and test steps in one place will increase transparency and reduce debugging time.
@@ -26,15 +26,15 @@ Centralizing data test and test steps in one place will increase transparency an
 E.g.
 
 ```java
-		String[] headers = { "name", "phone", "subject"};
-		String[] regexes = { "[a-z]{10}", "[0-9]{10}", "[a-z]{10}"};
+	String[] headers = { "name", "phone", "subject"};
+	String[] regexes = { "[a-z]{10}", "[0-9]{10}", "[a-z]{10}"};
 		
-		DataDriven data = new DataDriven().withGenRegex(titles, regexes);
-		Form formData = data.randomData();
+	DataDriven data = new DataDriven().withGenRegex(titles, regexes);
+	Form formData = data.randomData();
 		
-		formData.getField("name").getValue();
-		formData.getField("phone").getValue();
-		formData.getField("subject").getValue();
+	formData.getField("name").getValue();
+	formData.getField("phone").getValue();
+	formData.getField("subject").getValue();
 		
 ```
 
@@ -44,16 +44,16 @@ Separating data test and test steps will increase the flexibility of data format
 E.g.
 
 ```java
-		String filePath = "input.csv";
-		DataDriven data = new DataDriven().parse(filePath);
+	String filePath = "input.csv";
+	DataDriven data = new DataDriven().parse(filePath);
 		
-		List<Form> formDatas = data.getAll();
+	List<Form> formDatas = data.getAll();
 		
-		formDatas.forEach((formData) -> {
-			formData.getField("name").getValue());
-			formData.getField("phone").getValue());
-			formData.getField("subject").getValue());
-		});
+	formDatas.forEach((formData) -> {
+		formData.getField("name").getValue());
+		formData.getField("phone").getValue());
+		formData.getField("subject").getValue());
+	});
 ```
 
 **WebElement interactions and more**
