@@ -22,7 +22,7 @@ public abstract class Musala {
 	public static final String companyURLValue = "https://www.musala.com/company/";
 	public static final String companyFacebookURLValue = "https://www.facebook.com/MusalaSoft?fref=ts";
 	
-	public static final By careersHomeTabTabLocator = By.xpath("//a[@class='main-link' and text()='Careers']");
+	public static final By careersHomeTabTabLocator = By.xpath("//a[@href='https://www.musala.com/careers/']");
 	public static final By careersCheckOpenPositionsLocator = By.xpath("//span[@data-alt='Check our open positions']");
 	public static final By careersLocationSelectorLocator =  By.xpath("//select[@id='get_location']");
 	public static final By careersLocationAnywhereLocator = By.xpath("//select[@id='get_location']/option[@value='Anywhere']");

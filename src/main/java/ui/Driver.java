@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.By.ByClassName;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -34,7 +35,7 @@ public class Driver {
 		case firefox:
 			driverManager = WebDriverManager.firefoxdriver();
 			driverManager.setup();
-			driver = new FirefoxDriver();
+			driver = new FirefoxDriver(new FirefoxOptions().configureFromEnv());
 			break;
 		default:
 			System.out.println("[error] unsupported driver");

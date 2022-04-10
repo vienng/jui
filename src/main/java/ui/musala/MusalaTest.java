@@ -35,22 +35,21 @@ public class MusalaTest {
 	Driver driver;
 
 	@Parameters("browser")
-	@BeforeMethod()
+	@BeforeTest()
 	public void setUp(String browser) {
 		cfg = new Config();
 		cfg.loadConfig();
 		if (!cfg.isSupportedBrowser(browser)) {
-			System.out.printf("[warn] skip testing on browser %s \n", browser);
+			System.out.printf("[warn] skip testing on %s \n", browser);
 			throw new SkipException("");
 		} else {
 			System.out.printf("[info] start testing on %s ... \n", browser);
 		}
 
 		driver = new Driver(AvailableBrowsers.valueOf(browser));
-		driver.setup(cfg);
 	}
 
-	@AfterMethod()
+	@AfterTest()
 	public void tearDown() {
 		driver.quit();
 		System.out.println("[info] tear down successfully!");
@@ -77,14 +76,15 @@ public class MusalaTest {
 			driver.submitWithReCaptcha(Musala.contactUsSendButtonLocator,
 					ExpectedConditions.visibilityOfElementLocated((Musala.contactUsAlertLocator)));
 
-			assertTrue(
-					driver.isTextDisplayed(Musala.contactUsAlertLocator, Musala.contactUsInvalidEmailErrorValue),
+			assertTrue(driver.isTextDisplayed(Musala.contactUsAlertLocator, Musala.contactUsInvalidEmailErrorValue),
 					"message not found!");
 		}
 	}
 
 	@Test(description = "Test Case 2")
 	public void testVistingProfile() {
+		driver.setup(cfg);
+
 		driver.scrollToClick(Musala.companyHomeTabLocator);
 		assertEquals(driver.getCurrentURL(), Musala.companyURLValue);
 
@@ -95,7 +95,8 @@ public class MusalaTest {
 		driver.switchTab(1);
 		assertEquals(driver.getCurrentURL(), Musala.companyFacebookURLValue);
 
-		driver.waitUntil(ExpectedConditions.presenceOfElementLocated(Musala.companyFacebookProfilePhotoLocator), cfg.getTimeoutSeconds());
+		driver.waitUntil(ExpectedConditions.presenceOfElementLocated(Musala.companyFacebookProfilePhotoLocator),
+				cfg.getTimeoutSeconds());
 		assertTrue(driver.isElementDisplay(Musala.companyFacebookProfilePhotoLocator));
 	}
 
@@ -146,7 +147,7 @@ public class MusalaTest {
 					ExpectedConditions.presenceOfElementLocated(Musala.careerApplyErrorPopupLocator));
 			driver.waitUntil(ExpectedConditions.presenceOfElementLocated(Musala.careerApplyErrorPopupCloseLocator),
 					cfg.getTimeoutSeconds());
-			
+
 			assertTrue(driver.isTextDisplayed(Musala.careerApplyErrorAlertLocator,
 					formData.getField("expected_error").getValue()));
 		});
@@ -154,27 +155,29 @@ public class MusalaTest {
 
 	@Test(description = "Test Case 4")
 	public void testListingOpenPositions() {
+		driver.setup(cfg);
+
 		driver.scrollToClick(Musala.careersHomeTabTabLocator);
-		
+
 		driver.scrollToClick(Musala.careersCheckOpenPositionsLocator);
-		
-		String[] cities = {"Sofia", "Skopje"};
-		
+
+		String[] cities = { "Sofia", "Skopje" };
+
 		for (int i = 0; i < cities.length; i++) {
 			driver.selectOption(Musala.careersLocationSelectorLocator, cities[i]);
-			
+
 			List<String> titles = driver.getAtributesByClassName(Musala.careersJobTitleClassName, "data-alt");
 			List<String> links = driver.getAtributesByClassName(Musala.careersJobLinkClassName, "href");
-			
+
 			assertFalse(titles.isEmpty(), "empty title list!");
 			assertEquals(titles.size(), links.size(), "size of links and titles are not equal!");
-			
+
 			System.out.println("---------" + cities[i] + "---------");
 			for (int j = 0; j < titles.size(); j++) {
 				System.out.println("Position: " + titles.get(j));
 				System.out.println("More info: " + links.get(j));
 				System.out.println("---");
 			}
-		}		
+		}
 	}
 }
